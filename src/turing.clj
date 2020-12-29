@@ -113,6 +113,7 @@
 
 ;; let's print the sequence 001011011101111...
 
+
 (def transc-machine
   [[:begin nil :-> [[:print :sentinel] :move-right
                     [:print :sentinel] :move-right
@@ -135,7 +136,6 @@
 (def transc-configuration {:machine transc-machine
                            :current-state :begin
                            :tape [[] nil []]})
-
 
 (comment
   (future (run-loop transc-configuration)))
