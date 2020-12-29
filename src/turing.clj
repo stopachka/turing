@@ -31,16 +31,17 @@
 (comment
   (turing-erase [[0] 1 [0]]))
 
-(defn tape->pretty-seq [[left cur right]]
-  (filter
-   identity
-   (concat (reverse left) (list (list cur)) right)))
-
 (defn turing-print [[left _ right] v]
   [left v right])
 
 (comment
   (turing-print [[] nil []] 1))
+
+(defn display-block [block] (or block '_))
+(defn tape->pretty-seq [[left cur right]]
+  (map
+   display-block
+   (concat (reverse left) (list (list (display-block cur))) right)))
 
 ;; machine
 
@@ -97,16 +98,19 @@
            :current-state
            end-state)))
 
-(defn run-loop [configuration]
-  (loop [config configuration]
-    (let [{:keys [tape] :as config'} (run-step config)]
-      (println (tape->pretty-seq tape))
-      (Thread/sleep 1000)
-      (recur config'))))
+(defn run-loop [configuration end]
+  (loop [config configuration
+         i 0]
+    (if (= i end)
+      config
+      (let [{:keys [current-state tape] :as config'} (run-step config)]
+        (println (str "state: " current-state " | ") (tape->pretty-seq tape))
+        (Thread/sleep 200)
+        (recur config' (inc i))))))
 
 (comment
   (-> ex-configuration run-step run-step run-step :tape tape->pretty-seq)
-  (future (run-loop ex-configuration)))
+  (future (run-loop ex-configuration 10)))
 
 
 ;; transc
@@ -120,7 +124,7 @@
                     [:print 0] :move-right :move-right
                     [:print 0] :move-left :move-left] :o]
 
-   [:o 1 :-> [:move-right [:print :todo] :move-left :move-left :move-left] :q]
+   [:o 1 :-> [:move-right [:print :todo] :move-left :move-left :move-left] :o]
    [:o 0 :-> [] :q]
 
    [:q #{0 1} :-> [:move-right :move-right] :q]
@@ -138,4 +142,4 @@
                            :tape [[] nil []]})
 
 (comment
-  (future (run-loop transc-configuration)))
+  (future (run-loop transc-configuration 140)))
