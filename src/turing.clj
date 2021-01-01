@@ -142,4 +142,5 @@
                            :tape [[] nil []]})
 
 (comment
-  (future (run-loop transc-configuration 140)))
+  (run-loop transc-configuration 140))
+
